@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     : messages;
 
   const payload = JSON.stringify({
-    model: "llama3-70b-8192",
+    model: "llama-3.3-70b-versatile",
     max_tokens,
     messages: groqMessages,
   });
