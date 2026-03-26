@@ -11,29 +11,26 @@ export default async function handler(req, res) {
   const max_tokens = body?.max_tokens || 1000;
 
   if (!messages || !Array.isArray(messages)) {
-    return res.status(400).json({ 
-      error: "Invalid request body",
-      debug_body_type: typeof body,
-      debug_body: JSON.stringify(body),
-      debug_messages: JSON.stringify(messages)
-    });
+    return res.status(400).json({ error: "Invalid request body" });
   }
 
+  const groqMessages = system 
+    ? [{ role: "system", content: system }, ...messages]
+    : messages;
+
   const payload = JSON.stringify({
-    model: "claude-sonnet-4-20250514",
+    model: "llama3-70b-8192",
     max_tokens,
-    system,
-    messages,
+    messages: groqMessages,
   });
 
   const options = {
-    hostname: "api.anthropic.com",
-    path: "/v1/messages",
+    hostname: "api.groq.com",
+    path: "/openai/v1/chat/completions",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
+      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
       "Content-Length": Buffer.byteLength(payload),
     },
   };

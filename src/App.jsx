@@ -17,8 +17,10 @@ const callClaude = async (systemPrompt, userMessage) => {
   }
 
   const data = await response.json();
-  return data.content[0].text;
-};
+ if (data.choices) {
+  return data.choices[0].message.content;
+}
+return data.content[0].text;
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@300;400;500&display=swap');
