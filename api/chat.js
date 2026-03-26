@@ -5,10 +5,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { system, messages, max_tokens = 1000 } = req.body;
+  const body = req.body;
+  const messages = body?.messages;
+  const system = body?.system;
+  const max_tokens = body?.max_tokens || 1000;
 
   if (!messages || !Array.isArray(messages)) {
-    return res.status(400).json({ error: "Invalid request body" });
+    return res.status(400).json({ 
+      error: "Invalid request body",
+      debug_body_type: typeof body,
+      debug_body: JSON.stringify(body),
+      debug_messages: JSON.stringify(messages)
+    });
   }
 
   const payload = JSON.stringify({
@@ -47,10 +55,8 @@ export default async function handler(req, res) {
       request.write(payload);
       request.end();
     });
-
     return res.status(data.status).json(data.body);
   } catch (error) {
-    console.error("Proxy error:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: error.message });
   }
 }
